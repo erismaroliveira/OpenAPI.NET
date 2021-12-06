@@ -26,13 +26,13 @@ namespace Microsoft.OpenApi.Hidi
                 new Option("--input", "Input OpenAPI description file path or URL", typeof(string) ),
                 new Option("--output","Output OpenAPI description file", typeof(FileInfo), arity: ArgumentArity.ZeroOrOne),
                 new Option("--version", "OpenAPI specification version", typeof(OpenApiSpecVersion)),
-                new Option("--format", "File format",typeof(OpenApiFormat) ),
+                new Option("--format", "File format",typeof(string) ),
                 new Option("--inline", "Inline $ref instances", typeof(bool) ),
                 new Option("--resolveExternal","Resolve external $refs", typeof(bool)),
                 new Option("--filterByOperationIds", "Filters OpenApiDocument by OperationId(s) provided", typeof(string)),
                 new Option("--filterByTags", "Filters OpenApiDocument by Tag(s) provided", typeof(string))
             };
-            transformCommand.Handler = CommandHandler.Create<string, FileInfo, OpenApiSpecVersion, OpenApiFormat, string, string, bool, bool>(
+            transformCommand.Handler = CommandHandler.Create<string, FileInfo, OpenApiSpecVersion, string, string, string, bool, bool>(
                 OpenApiService.ProcessOpenApiDocument);
 
             rootCommand.Add(transformCommand);

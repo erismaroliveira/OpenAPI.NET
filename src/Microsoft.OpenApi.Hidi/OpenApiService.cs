@@ -22,7 +22,7 @@ namespace Microsoft.OpenApi.Hidi
             string input,
             FileInfo output,
             OpenApiSpecVersion version,
-            OpenApiFormat format,
+            string format,
             string filterByOperationIds,
             string filterByTags,
             bool inline,
@@ -91,7 +91,9 @@ namespace Microsoft.OpenApi.Hidi
             {
                 ReferenceInline = inline ? ReferenceInlineSetting.InlineLocalReferences : ReferenceInlineSetting.DoNotInlineReferences
             };
-            IOpenApiWriter writer = format switch
+
+            var openApiFormat = GetFormatOrDefault(input, format);
+            IOpenApiWriter writer = openApiFormat switch
             {
                 OpenApiFormat.Json => new OpenApiJsonWriter(textWriter, settings),
                 OpenApiFormat.Yaml => new OpenApiYamlWriter(textWriter, settings),
@@ -155,6 +157,31 @@ namespace Microsoft.OpenApi.Hidi
             walker.Walk(document);
 
             Console.WriteLine(statsVisitor.GetStatisticsReport());
+        }
+
+        private static OpenApiFormat GetFormatOrDefault(string input, string format)
+        {
+            OpenApiFormat openApiFormat;
+            if (!string.IsNullOrEmpty(format))
+            {
+                if (Enum.TryParse(format, out openApiFormat))
+                {
+                    return openApiFormat;
+                }
+                else
+                {
+                    throw new ArgumentException($"Unknown format: {format}. Supported formats are {OpenApiFormat.Yaml} and {OpenApiFormat.Json}.");
+                }
+            }
+
+            if (!input.StartsWith("http") && Path.GetExtension(input) == ".json")
+            {
+                return OpenApiFormat.Json;
+            }
+            else
+            {
+                return OpenApiFormat.Yaml;
+            }
         }
     }
 }
